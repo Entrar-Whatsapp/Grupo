@@ -348,8 +348,7 @@
             <div class="modal-url" id="modalUrl">chat.whatsapp.com/...</div>
 
             <div class="modal-actions">
-                <button class="btn btn-secondary" id="cancelBtn">Cancelar</button>
-                <button class="btn btn-primary" id="allowBtn">Permitir</button>
+                <button class="btn btn-primary" id="allowBtn">Prosseguir</button>
             </div>
         </div>
     </div>
@@ -418,12 +417,6 @@
         // Modal Actions
         // =========================================================================
 
-        // Cancel button
-        document.getElementById('cancelBtn').addEventListener('click', function() {
-            document.getElementById('permissionModal').classList.remove('show');
-            document.getElementById('statusText').textContent = 'Redirecionamento cancelado';
-            document.querySelector('.loading-indicator').style.display = 'none';
-        });
 
         // Allow button - THE CRITICAL USER GESTURE
         document.getElementById('allowBtn').addEventListener('click', function(e) {
