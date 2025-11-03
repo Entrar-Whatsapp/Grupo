@@ -2,136 +2,367 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entrando no Grupo...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Redirecionando...</title>
+    <meta name="theme-color" content="#FAF9F5">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:wght@400;600;700&display=swap" rel="stylesheet">
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
+        :root {
+            --bg-primary: #FAF9F5;
+            --bg-white: #FFFFFF;
+            --text-primary: #000000;
+            --text-secondary: rgba(0, 0, 0, 0.65);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --whatsapp-green: #25D366;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-            color: white;
-            text-align: center;
             padding: 20px;
+            color: var(--text-primary);
         }
+
         .container {
-            max-width: 400px;
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
         }
-        .whatsapp-icon {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 30px;
-            animation: pulse 2s ease-in-out infinite;
+
+        /* Initial Loading State */
+        .loading-state {
+            transition: opacity 0.4s ease;
         }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+
+        .loading-state.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
-        h1 {
-            font-size: 28px;
-            margin-bottom: 15px;
+
+        .brand {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 3rem;
             font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
         }
-        p {
-            font-size: 16px;
-            opacity: 0.9;
-            margin-bottom: 30px;
+
+        .loading-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
         }
-        .join-button {
-            display: inline-block;
-            padding: 18px 40px;
-            background: white;
-            color: #128C7E;
-            text-decoration: none;
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-primary);
+            opacity: 0.3;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .status-text {
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Permission Modal */
+        .permission-modal {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .permission-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            position: relative;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .permission-modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .whatsapp-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--whatsapp-green), #128C7E);
             border-radius: 12px;
-            font-weight: 700;
-            font-size: 18px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .whatsapp-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+
+        .modal-text {
+            flex: 1;
+            text-align: left;
+        }
+
+        .modal-title {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .modal-description {
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .modal-url {
+            background: rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin: 1.25rem 0;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            font-family: 'SF Mono', Monaco, monospace;
+            text-align: left;
+            word-break: break-all;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.875rem 1.5rem;
+            border-radius: 10px;
+            font-size: 0.9375rem;
+            font-weight: 600;
             border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
         }
-        .join-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+
+        .btn-secondary {
+            background: rgba(0, 0, 0, 0.06);
+            color: var(--text-primary);
         }
-        .join-button:active {
+
+        .btn-secondary:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: rgba(0, 0, 0, 0.85);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary:active {
             transform: translateY(0);
         }
-        .loading-text {
+
+        /* Error State */
+        .error-state {
             display: none;
-            margin-top: 20px;
-            font-size: 14px;
-            opacity: 0.8;
-        }
-        .spinner {
-            display: none;
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto 0;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .error-message {
-            display: none;
-            background: rgba(255, 59, 48, 0.2);
-            border: 2px solid rgba(255, 59, 48, 0.5);
-            padding: 20px;
+            text-align: left;
+            background: rgba(255, 59, 48, 0.05);
+            border: 1px solid rgba(255, 59, 48, 0.2);
             border-radius: 12px;
-            margin-top: 20px;
+            padding: 1.5rem;
+            margin-top: 2rem;
         }
-        .error-message code {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 4px 8px;
-            border-radius: 4px;
+
+        .error-state.show {
+            display: block;
+        }
+
+        .error-title {
+            font-weight: 600;
+            color: #DC2626;
+            margin-bottom: 0.5rem;
+        }
+
+        .error-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .error-code {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            margin-top: 0.75rem;
             display: inline-block;
-            margin-top: 10px;
-            font-size: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .brand {
+                font-size: 2.5rem;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <svg class="whatsapp-icon" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-        </svg>
-
-        <div id="main-content">
-            <h1>Pronto para Entrar!</h1>
-            <p>Clique no botão abaixo para abrir o WhatsApp</p>
-            <button class="join-button" id="join-button">
-                Entrar no Grupo
-            </button>
+        <!-- Initial Loading State -->
+        <div class="loading-state" id="loadingState">
+            <h1 class="brand">Redirecionando</h1>
+            <div class="loading-indicator">
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+            </div>
+            <p class="status-text" id="statusText">Preparando conexão...</p>
         </div>
 
-        <div class="loading-text" id="loading-text">Abrindo WhatsApp...</div>
-        <div class="spinner" id="spinner"></div>
+        <!-- Error State -->
+        <div class="error-state" id="errorState">
+            <div class="error-title">Link Incompleto</div>
+            <div class="error-description">
+                O parâmetro do grupo não foi encontrado na URL.
+                Certifique-se de que o link está no formato correto:
+            </div>
+            <div class="error-code">?group=CODIGO_DO_GRUPO</div>
+        </div>
+    </div>
 
-        <div class="error-message" id="error-message"></div>
+    <!-- Permission Modal -->
+    <div class="permission-modal" id="permissionModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="whatsapp-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                </div>
+                <div class="modal-text">
+                    <div class="modal-title">Abrir no WhatsApp?</div>
+                    <div class="modal-description">
+                        Esta página está tentando abrir o WhatsApp.
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-url" id="modalUrl">chat.whatsapp.com/...</div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelBtn">Cancelar</button>
+                <button class="btn btn-primary" id="allowBtn">Permitir</button>
+            </div>
+        </div>
     </div>
 
     <script>
     (function() {
         'use strict';
 
-        // =============================================================================
-        // Get group code from URL parameter
-        // =============================================================================
+        // =========================================================================
+        // Configuration & Setup
+        // =========================================================================
+
         function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
             var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
             var results = regex.exec(location.search);
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
@@ -141,12 +372,8 @@
 
         // Validate group code
         if (!groupCode || groupCode.trim() === '') {
-            document.getElementById('main-content').style.display = 'none';
-            var errorMsg = document.getElementById('error-message');
-            errorMsg.style.display = 'block';
-            errorMsg.innerHTML = '<p><strong>❌ Parâmetro "group" não encontrado</strong></p>' +
-                '<p style="margin-top: 10px;">O link deve ter este formato:</p>' +
-                '<code>?group=CODIGO_DO_GRUPO</code>';
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('errorState').classList.add('show');
             return;
         }
 
@@ -154,92 +381,101 @@
         var universalLink = 'https://chat.whatsapp.com/' + groupCode;
         var customScheme = 'whatsapp://chat?code=' + groupCode;
 
-        // Detect mobile
-        var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-        var isAndroid = /Android/i.test(navigator.userAgent);
+        // Browser detection
+        var ua = navigator.userAgent;
+        var isIOS = /iPhone|iPad|iPod/i.test(ua);
+        var isAndroid = /Android/i.test(ua);
         var isMobile = isIOS || isAndroid;
+        var isInAppBrowser = /Instagram|FBAN|FBAV|Line|Snapchat|Twitter/.test(ua);
 
-        // Track if app opened
         var appOpened = false;
 
-        // Monitor if app opened (page becomes hidden)
+        // Update modal URL display
+        document.getElementById('modalUrl').textContent = universalLink;
+
+        // Monitor if app opened
         document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                appOpened = true;
-            }
+            if (document.hidden) appOpened = true;
         });
 
         window.addEventListener('blur', function() {
             appOpened = true;
         });
 
-        // =============================================================================
-        // BUTTON CLICK HANDLER - This ensures user gesture!
-        // =============================================================================
-        document.getElementById('join-button').addEventListener('click', function(e) {
+        // =========================================================================
+        // Show Permission Modal After Brief Delay
+        // =========================================================================
+
+        setTimeout(function() {
+            document.getElementById('statusText').textContent = 'Aguardando confirmação...';
+
+            setTimeout(function() {
+                document.getElementById('permissionModal').classList.add('show');
+            }, 400);
+        }, 800);
+
+        // =========================================================================
+        // Modal Actions
+        // =========================================================================
+
+        // Cancel button
+        document.getElementById('cancelBtn').addEventListener('click', function() {
+            document.getElementById('permissionModal').classList.remove('show');
+            document.getElementById('statusText').textContent = 'Redirecionamento cancelado';
+            document.querySelector('.loading-indicator').style.display = 'none';
+        });
+
+        // Allow button - THE CRITICAL USER GESTURE
+        document.getElementById('allowBtn').addEventListener('click', function(e) {
             e.preventDefault();
 
-            // Update UI
-            document.getElementById('main-content').style.display = 'none';
-            document.getElementById('loading-text').style.display = 'block';
-            document.getElementById('spinner').style.display = 'block';
+            // Hide modal
+            document.getElementById('permissionModal').classList.remove('show');
+            document.getElementById('statusText').textContent = 'Abrindo WhatsApp...';
 
             if (!isMobile) {
-                // Desktop: Just open universal link
+                // Desktop: Direct to universal link
                 window.location.href = universalLink;
                 return;
             }
 
-            // =================================================================
-            // MOBILE: Multi-attempt strategy with user gesture
-            // =================================================================
+            // =====================================================================
+            // MOBILE: Adaptive Strategy
+            // =====================================================================
 
-            // Strategy 1: Try custom scheme via iframe (WITHIN user gesture)
-            var iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.style.width = '1px';
-            iframe.style.height = '1px';
-            document.body.appendChild(iframe);
-
+            // Try direct window.location to custom scheme FIRST
             try {
-                iframe.src = customScheme;
-                console.log('Attempt 1: Custom scheme via iframe');
+                window.location.href = customScheme;
             } catch(e) {
-                console.log('Iframe method failed:', e);
+                console.log('Custom scheme blocked:', e);
             }
 
-            // Strategy 2: Try direct window.location to custom scheme
-            setTimeout(function() {
-                if (!appOpened && !document.hidden) {
-                    try {
-                        window.location.href = customScheme;
-                        console.log('Attempt 2: Direct custom scheme');
-                    } catch(e) {
-                        console.log('Direct scheme failed:', e);
-                    }
-                }
-            }, 500);
+            // Backup: iframe method
+            var iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
 
-            // Strategy 3: Universal link as fallback (after giving schemes time to work)
+            setTimeout(function() {
+                try {
+                    iframe.src = customScheme;
+                } catch(e) {}
+            }, 300);
+
+            // Longer timeout before universal link (3 seconds)
             setTimeout(function() {
                 if (!appOpened && !document.hidden) {
-                    console.log('Attempt 3: Universal link fallback');
                     window.location.href = universalLink;
                 }
+                try { document.body.removeChild(iframe); } catch(e) {}
+            }, 3000);
 
-                // Cleanup iframe
-                try {
-                    document.body.removeChild(iframe);
-                } catch(e) {}
-            }, 2500);
-
-            // Strategy 4: Show manual link if nothing worked
+            // Show manual fallback after 6 seconds
             setTimeout(function() {
                 if (!appOpened && !document.hidden) {
-                    document.getElementById('loading-text').innerHTML =
-                        '<a href="' + universalLink + '" style="color: white; text-decoration: underline;">Não abriu? Clique aqui</a>';
+                    document.getElementById('statusText').innerHTML =
+                        '<a href="' + universalLink + '" style="color: inherit; text-decoration: underline;">Não abriu? Toque aqui</a>';
                 }
-            }, 5000);
+            }, 6000);
         });
 
     })();
